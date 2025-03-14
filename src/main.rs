@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 use common::*;
 use player::*;
-use world::*;
+use stage_1::*;
 
 mod common;
 mod modules;
 mod player;
-mod world;
+mod stage_1;
+
+const GRAVITY: f32 = 9.8 * 5.;
 
 fn main() {
     let mut app = App::new();
@@ -20,10 +22,12 @@ fn plugin(app: &mut App) {
     app.add_plugins(DefaultPlugins);
 }
 fn startup(app: &mut App) {
-    app.add_systems(Startup, setup);
+    app.add_systems(Startup, setup_stage_1);
 }
 fn update(app: &mut App) {
     app.add_systems(Update, execute_animations);
     app.add_systems(Update, player_sprite_controller);
     app.add_systems(Update, player_movement);
+    app.add_systems(Update, acelleration);
+    app.add_systems(Update, gravity);
 }

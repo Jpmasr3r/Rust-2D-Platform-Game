@@ -34,3 +34,18 @@ impl AnimationConfig {
         Timer::from_seconds(1. / (fps as f32), TimerMode::Once)
     }
 }
+
+#[derive(Component)]
+pub struct Gravity {
+    pub vel_y: f32,
+    pub vel_x: f32,
+    pub max_vel_y: f32,
+    pub max_vel_x: f32,
+}
+
+pub enum Block {
+    Player,
+    Ground,
+    FakeGround,
+    None,
+}
