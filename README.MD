@@ -28,3 +28,4 @@ As principais dependências do projeto são:
 
 - **Movimento do Jogador**: O jogador pode se mover para a esquerda e direita utilizando as teclas `A` e `D`.
 - **Animações**: O jogador possui animações para os estados de idle e walking.
+- **Mapa Baseado em Imagem**: O mapa do jogo é gerado a partir de uma imagem, onde cada pixel corresponde a um bloco ou entidade no jogo.
