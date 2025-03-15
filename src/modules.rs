@@ -49,3 +49,6 @@ pub enum Block {
     FakeGround,
     None,
 }
+
+#[derive(Component)]
+pub struct CameraPlayer;

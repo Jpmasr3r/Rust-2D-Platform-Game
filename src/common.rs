@@ -21,6 +21,13 @@ pub fn execute_animations(time: Res<Time>, mut query: Query<(&mut AnimationConfi
     }
 }
 
+pub fn camera_controller(
+    mut camera: Single<&mut Transform, (With<CameraPlayer>, Without<Player>)>,
+    player: Single<&Transform, With<Player>>,
+) {
+    camera.translation = player.translation;
+}
+
 pub fn acelleration(mut entity_querry: Query<(&mut Transform, &mut Gravity), With<Gravity>>) {
     for mut entity in entity_querry.iter_mut() {
         entity.0.translation.y += entity.1.vel_y;
@@ -32,10 +39,6 @@ pub fn acelleration(mut entity_querry: Query<(&mut Transform, &mut Gravity), Wit
         if entity.1.vel_x > entity.1.max_vel_x {
             entity.1.vel_x = entity.1.max_vel_x;
         }
-        // println!(
-        //     "y = {}\nx = {}\nvel_y = {}\nvel_x = {}",
-        //     entity.0.translation.y, entity.0.translation.x, entity.1.vel_y, entity.1.vel_x
-        // )
     }
 }
 

@@ -10,6 +10,7 @@ pub fn setup_stage_1(
     commands.spawn((
         Camera2d::default(),
         Transform::from_translation(Vec3::new(0.0, 0.0, 1.0)),
+        CameraPlayer,
     ));
 
     for block in load_image_to_blocks("assets/stages/stage-1.png") {
