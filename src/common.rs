@@ -28,10 +28,13 @@ pub fn camera_controller(
     camera.translation = player.translation;
 }
 
-pub fn acelleration(mut entity_querry: Query<(&mut Transform, &mut Gravity), With<Gravity>>) {
+pub fn acelleration(
+    mut entity_querry: Query<(&mut Transform, &mut Gravity), With<Gravity>>,
+    time: Res<Time>,
+) {
     for mut entity in entity_querry.iter_mut() {
-        entity.0.translation.y += entity.1.vel_y;
-        entity.0.translation.x += entity.1.vel_x;
+        entity.0.translation.y += entity.1.vel_y * time.delta_secs();
+        entity.0.translation.x += entity.1.vel_x * time.delta_secs();
 
         if entity.1.vel_y > entity.1.max_vel_y {
             entity.1.vel_y = entity.1.max_vel_y;
@@ -42,15 +45,54 @@ pub fn acelleration(mut entity_querry: Query<(&mut Transform, &mut Gravity), Wit
     }
 }
 
-pub fn gravity(mut entity_querry: Query<&mut Gravity, With<Gravity>>) {
+pub fn gravity(
+    mut entity_querry: Query<
+        (&mut Gravity, &Collider, &mut Transform),
+        (With<Gravity>, Without<Ground>),
+    >,
+    ground_querry: Query<(&Collider, &Transform), With<Ground>>,
+) {
     for mut entity in entity_querry.iter_mut() {
-        if entity.vel_y >= entity.max_vel_y {
+        if entity.0.vel_y >= entity.0.max_vel_y {
             continue;
         }
 
-        entity.vel_y -= 5.;
+        let mut in_grav: bool = true;
+
+        let mut transform_a = entity.2.clone();
+        transform_a.translation.y -= 1.;
+
+        for ground in ground_querry.iter() {
+            if check_colision((entity.1, &transform_a), ground) {
+                in_grav = false;
+                entity.0.vel_y = 0.;
+                break;
+            }
+        }
+
+        if in_grav {
+            entity.0.vel_y -= 5.;
+        } else {
+            entity.0.vel_y = 0.;
+        }
     }
 }
+
+pub fn check_colision(
+    entity_a: (&Collider, &Transform),
+    entity_b: (&Collider, &Transform),
+) -> bool {
+    let (collider_a, transform_a) = entity_a;
+    let (collider_b, transform_b) = entity_b;
+
+    let collision_x = (transform_a.translation.x - transform_b.translation.x).abs()
+        < (collider_a.width + collider_b.width) / 2.0;
+    let collision_y = (transform_a.translation.y - transform_b.translation.y).abs()
+        < (collider_a.height + collider_b.height) / 2.0;
+
+    collision_x && collision_y
+}
+
 pub fn load_image_to_blocks(image_path: &str) -> Vec<(f32, f32, Block)> {
     let img = image::open(image_path).expect("Failed to open image");
     let mut blocks = Vec::new();
@@ -66,7 +108,7 @@ pub fn load_image_to_blocks(image_path: &str) -> Vec<(f32, f32, Block)> {
         if rgba[3] != 255 {
             block = Block::None;
         }
-        blocks.push((x as f32 * -1., y as f32 * -1., block));
+        blocks.push((x as f32, y as f32 * -1., block));
     }
 
     blocks

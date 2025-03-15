@@ -50,6 +50,11 @@ pub fn setup_stage_1(
                         },
                         ..Default::default()
                     },
+                    Ground,
+                    Collider {
+                        height: size,
+                        width: size,
+                    },
                 ));
             }
             Block::FakeGround => {

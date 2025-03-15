@@ -52,3 +52,12 @@ pub enum Block {
 
 #[derive(Component)]
 pub struct CameraPlayer;
+
+#[derive(Component)]
+pub struct Ground;
+
+#[derive(Component)]
+pub struct Collider {
+    pub width: f32,
+    pub height: f32,
+}

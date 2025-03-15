@@ -21,6 +21,10 @@ pub fn player_setup(commands: &mut Commands, x: f32, y: f32) {
             vel_x: 0.,
             vel_y: 0.,
         },
+        Collider {
+            width: 16.,
+            height: 27.,
+        },
     ));
 }
 
