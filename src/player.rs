@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{GRAVITY, modules::*};
+use crate::{GRAVITY, common::check_colision, modules::*};
 
 pub fn player_setup(commands: &mut Commands, x: f32, y: f32) {
     commands.spawn((
@@ -14,11 +14,12 @@ pub fn player_setup(commands: &mut Commands, x: f32, y: f32) {
         Player {
             state: PlayerState::Idle,
             speed: 50.,
+            jump_force: (2.0 * GRAVITY * 64.).sqrt(),
         },
         AnimationConfig::new(10, 0, 0),
         Movable {
             max_vel_x: 200.,
-            max_vel_y: GRAVITY,
+            max_vel_y: (2.0 * GRAVITY * 32.).sqrt(),
             vel_x: 0.,
             vel_y: 0.,
         },
@@ -54,6 +55,13 @@ pub fn player_sprite_controller(
                 width = 16;
                 height = 27;
             }
+            PlayerState::Jumping => {
+                sprite = "player/player_jump.png";
+                first = 0;
+                last = 0;
+                width = 16;
+                height = 26;
+            }
         }
 
         player.2.first_frame = first;
@@ -80,6 +88,31 @@ pub fn player_sprite_controller(
     }
 }
 
+pub fn player_state_controller(
+    mut players: Query<(&mut Player, &mut Movable, &mut Sprite), With<Player>>,
+) {
+    for mut player in players.iter_mut() {
+        match player.1.vel_x.signum() {
+            1. => {
+                player.2.flip_x = false;
+            }
+            -1. => {
+                player.2.flip_x = true;
+            }
+            _ => {
+                player.2.flip_x = player.2.flip_x;
+            }
+        }
+        if player.1.vel_y != 0. {
+            player.0.state = PlayerState::Jumping;
+        } else if player.1.vel_x != 0. {
+            player.0.state = PlayerState::Walking;
+        } else {
+            player.0.state = PlayerState::Idle;
+        }
+    }
+}
+
 pub fn player_movement(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut players: Query<(&mut Player, &mut Movable, &mut Sprite), With<Player>>,
@@ -87,23 +120,41 @@ pub fn player_movement(
     let new_movment = ((keyboard_input.pressed(KeyCode::KeyD) as i8)
         - (keyboard_input.pressed(KeyCode::KeyA) as i8)) as f32;
     for mut player in players.iter_mut() {
+        println!("Player.Y = {}", player.1.vel_y);
+        println!("Player.X = {}", player.1.vel_x);
+        if player.1.vel_x.abs() >= player.1.max_vel_x {
+            player.1.vel_x = player.1.max_vel_x * player.1.vel_x.signum();
+        }
+
         if new_movment != 0. {
-            player.0.state = PlayerState::Walking;
             player.1.vel_x += new_movment * player.0.speed;
         } else {
-            player.0.state = PlayerState::Idle;
             player.1.vel_x = 0.;
         }
-        match new_movment {
-            -1. => {
-                player.2.flip_x = true;
+    }
+}
+
+pub fn player_jump(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut players: Query<
+        (&mut Player, &mut Movable, &Collider, &Transform),
+        (With<Player>, Without<Ground>),
+    >,
+    ground_querry: Query<(&Collider, &Transform), With<Ground>>,
+) {
+    let new_movment = (keyboard_input.pressed(KeyCode::Space) as i8) as f32;
+    for mut player in players.iter_mut() {
+        let mut can_jump = false;
+        let mut entity_transform = player.3.clone();
+        entity_transform.translation.y -= 5.;
+
+        for ground in ground_querry.iter() {
+            if check_colision((player.2, &entity_transform), ground) {
+                can_jump = true;
             }
-            1. => {
-                player.2.flip_x = false;
-            }
-            _ => {
-                player.2.flip_x = player.2.flip_x;
-            }
+        }
+        if new_movment != 0. && can_jump {
+            player.1.vel_y += new_movment * player.0.jump_force;
         }
     }
 }

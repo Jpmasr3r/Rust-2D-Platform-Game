@@ -8,7 +8,7 @@ mod modules;
 mod player;
 mod stage_1;
 
-const GRAVITY: f32 = 9.8 * 5.;
+const GRAVITY: f32 = 9.8 * 50.;
 
 fn main() {
     let mut app = App::new();
@@ -25,10 +25,15 @@ fn startup(app: &mut App) {
     app.add_systems(Startup, setup_stage_1);
 }
 fn update(app: &mut App) {
+    //Others
     app.add_systems(Update, execute_animations);
-    app.add_systems(Update, player_sprite_controller);
-    app.add_systems(Update, player_movement);
+    app.add_systems(Update, camera_controller);
     app.add_systems(Update, acceleration);
     app.add_systems(Update, gravity);
-    app.add_systems(Update, camera_controller);
+
+    //Player Updates
+    app.add_systems(Update, player_movement);
+    app.add_systems(Update, player_jump);
+    app.add_systems(Update, player_sprite_controller);
+    app.add_systems(Update, player_state_controller);
 }

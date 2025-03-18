@@ -32,16 +32,9 @@ pub fn acceleration(
     mut entity_query: Query<(&mut Transform, &mut Movable), With<Movable>>,
     time: Res<Time>,
 ) {
-    for (mut transform, mut gravity) in entity_query.iter_mut() {
-        transform.translation.y += gravity.vel_y * time.delta_secs();
-        transform.translation.x += gravity.vel_x * time.delta_secs();
-
-        if gravity.vel_x > gravity.max_vel_x {
-            gravity.vel_x = gravity.max_vel_x;
-        }
-        if gravity.vel_x < -gravity.max_vel_x {
-            gravity.vel_x = -gravity.max_vel_x;
-        }
+    for mut entity in entity_query.iter_mut() {
+        entity.0.translation.y += entity.1.vel_y * time.delta_secs();
+        entity.0.translation.x += entity.1.vel_x * time.delta_secs();
     }
 }
 
@@ -53,26 +46,25 @@ pub fn gravity(
     ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
     for mut entity in entity_querry.iter_mut() {
-        if entity.0.vel_y >= entity.0.max_vel_y {
-            continue;
-        }
-
         let mut in_grav: bool = true;
+        let acelartion = 5.;
 
         let mut transform_a = entity.2.clone();
-        transform_a.translation.y -= 1.;
+        transform_a.translation.y -= acelartion;
 
         for ground in ground_querry.iter() {
             if check_colision((entity.1, &transform_a), ground) {
                 in_grav = false;
-                entity.0.vel_y = 0.;
                 break;
             }
         }
 
+        if entity.0.vel_y.abs() >= entity.0.max_vel_y {
+            entity.0.vel_y = entity.0.max_vel_y * entity.0.vel_y.signum();
+        }
         if in_grav {
-            entity.0.vel_y -= 5.;
-        } else {
+            entity.0.vel_y -= acelartion;
+        } else if entity.0.vel_y < 0. {
             entity.0.vel_y = 0.;
         }
     }

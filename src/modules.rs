@@ -4,11 +4,13 @@ use bevy::prelude::*;
 pub struct Player {
     pub state: PlayerState,
     pub speed: f32,
+    pub jump_force: f32,
 }
 
 pub enum PlayerState {
     Idle,
     Walking,
+    Jumping,
 }
 
 #[derive(Component)]
