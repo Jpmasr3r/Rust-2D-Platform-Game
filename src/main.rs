@@ -28,7 +28,7 @@ fn update(app: &mut App) {
     app.add_systems(Update, execute_animations);
     app.add_systems(Update, player_sprite_controller);
     app.add_systems(Update, player_movement);
-    app.add_systems(Update, acelleration);
+    app.add_systems(Update, acceleration);
     app.add_systems(Update, gravity);
     app.add_systems(Update, camera_controller);
 }

@@ -28,27 +28,27 @@ pub fn camera_controller(
     camera.translation = player.translation;
 }
 
-pub fn acelleration(
-    mut entity_querry: Query<(&mut Transform, &mut Gravity), With<Gravity>>,
+pub fn acceleration(
+    mut entity_query: Query<(&mut Transform, &mut Movable), With<Movable>>,
     time: Res<Time>,
 ) {
-    for mut entity in entity_querry.iter_mut() {
-        entity.0.translation.y += entity.1.vel_y * time.delta_secs();
-        entity.0.translation.x += entity.1.vel_x * time.delta_secs();
+    for (mut transform, mut gravity) in entity_query.iter_mut() {
+        transform.translation.y += gravity.vel_y * time.delta_secs();
+        transform.translation.x += gravity.vel_x * time.delta_secs();
 
-        if entity.1.vel_y > entity.1.max_vel_y {
-            entity.1.vel_y = entity.1.max_vel_y;
+        if gravity.vel_x > gravity.max_vel_x {
+            gravity.vel_x = gravity.max_vel_x;
         }
-        if entity.1.vel_x > entity.1.max_vel_x {
-            entity.1.vel_x = entity.1.max_vel_x;
+        if gravity.vel_x < -gravity.max_vel_x {
+            gravity.vel_x = -gravity.max_vel_x;
         }
     }
 }
 
 pub fn gravity(
     mut entity_querry: Query<
-        (&mut Gravity, &Collider, &mut Transform),
-        (With<Gravity>, Without<Ground>),
+        (&mut Movable, &Collider, &mut Transform),
+        (With<Movable>, Without<Ground>),
     >,
     ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {

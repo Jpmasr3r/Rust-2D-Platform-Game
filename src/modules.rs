@@ -3,6 +3,7 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Player {
     pub state: PlayerState,
+    pub speed: f32,
 }
 
 pub enum PlayerState {
@@ -36,7 +37,7 @@ impl AnimationConfig {
 }
 
 #[derive(Component)]
-pub struct Gravity {
+pub struct Movable {
     pub vel_y: f32,
     pub vel_x: f32,
     pub max_vel_y: f32,

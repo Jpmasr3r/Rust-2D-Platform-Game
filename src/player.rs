@@ -13,9 +13,10 @@ pub fn player_setup(commands: &mut Commands, x: f32, y: f32) {
         },
         Player {
             state: PlayerState::Idle,
+            speed: 50.,
         },
         AnimationConfig::new(10, 0, 0),
-        Gravity {
+        Movable {
             max_vel_x: 200.,
             max_vel_y: GRAVITY,
             vel_x: 0.,
@@ -81,20 +82,28 @@ pub fn player_sprite_controller(
 
 pub fn player_movement(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut players: Query<&mut Player, With<Player>>,
+    mut players: Query<(&mut Player, &mut Movable, &mut Sprite), With<Player>>,
 ) {
+    let new_movment = ((keyboard_input.pressed(KeyCode::KeyD) as i8)
+        - (keyboard_input.pressed(KeyCode::KeyA) as i8)) as f32;
     for mut player in players.iter_mut() {
-        let new_movment = Vec3::new(
-            ((keyboard_input.pressed(KeyCode::KeyA) as i8)
-                - (keyboard_input.pressed(KeyCode::KeyD) as i8)) as f32,
-            0.,
-            0.,
-        );
-
-        if new_movment.x != 0. {
-            player.state = PlayerState::Walking;
+        if new_movment != 0. {
+            player.0.state = PlayerState::Walking;
+            player.1.vel_x += new_movment * player.0.speed;
         } else {
-            player.state = PlayerState::Idle;
+            player.0.state = PlayerState::Idle;
+            player.1.vel_x = 0.;
+        }
+        match new_movment {
+            -1. => {
+                player.2.flip_x = true;
+            }
+            1. => {
+                player.2.flip_x = false;
+            }
+            _ => {
+                player.2.flip_x = player.2.flip_x;
+            }
         }
     }
 }
