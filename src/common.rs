@@ -47,9 +47,9 @@ pub fn gravity(
 ) {
     for mut entity in entity_querry.iter_mut() {
         let mut in_grav: bool = true;
-        let acelartion = 5.;
+        let acelartion: f32 = 5.;
 
-        let mut transform_a = entity.2.clone();
+        let mut transform_a: Transform = entity.2.clone();
         transform_a.translation.y -= acelartion;
 
         for ground in ground_querry.iter() {
@@ -77,6 +77,13 @@ pub fn check_colision(
     let (collider_a, transform_a) = entity_a;
     let (collider_b, transform_b) = entity_b;
 
+    if collider_a.width < 0. && collider_a.height < 0. {
+        return false;
+    }
+    if collider_b.width < 0. && collider_b.height < 0. {
+        return false;
+    }
+
     let collision_x = (transform_a.translation.x - transform_b.translation.x).abs()
         < (collider_a.width + collider_b.width) / 2.0;
     let collision_y = (transform_a.translation.y - transform_b.translation.y).abs()
@@ -86,15 +93,16 @@ pub fn check_colision(
 }
 
 pub fn load_image_to_blocks(image_path: &str) -> Vec<(f32, f32, Block)> {
-    let img = image::open(image_path).expect("Failed to open image");
-    let mut blocks = Vec::new();
+    let img: image::DynamicImage = image::open(image_path).expect("Failed to open image");
+    let mut blocks: Vec<(f32, f32, Block)> = Vec::new();
 
     for (x, y, pixel) in img.pixels() {
-        let rgba = pixel.0;
-        let mut block = match (rgba[0], rgba[1], rgba[2]) {
+        let rgba: [u8; 4] = pixel.0;
+        let mut block: Block = match (rgba[0], rgba[1], rgba[2]) {
             (128, 0, 128) => Block::Player,
             (255, 255, 0) => Block::Ground,
             (0, 0, 0) => Block::FakeGround,
+            (255, 0, 0) => Block::RedTurtle,
             _ => Block::None,
         };
         if rgba[3] != 255 {

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{common::load_image_to_blocks, modules::*, player::player_setup};
+use crate::{bundles::*, common::load_image_to_blocks, modules::*, player::player_setup};
 
 pub fn setup_stage_1(
     mut commands: Commands,
@@ -19,76 +19,24 @@ pub fn setup_stage_1(
                 player_setup(&mut commands, block.0, block.1);
             }
             Block::Ground => {
-                let texture: Handle<Image> = asset_server.load("stages/ground_sheet.png");
-                let size = 16.;
-                let layout = TextureAtlasLayout::from_grid(
-                    UVec2 {
-                        x: size as u32,
-                        y: size as u32,
-                    },
-                    3,
-                    3,
-                    None,
-                    None,
-                );
-                let texture_atlas_layout = texture_atlas_layouts.add(layout);
-
-                commands.spawn((
-                    Sprite {
-                        image: texture,
-                        texture_atlas: Some(TextureAtlas {
-                            layout: texture_atlas_layout.clone(),
-                            index: 1,
-                        }),
-                        ..Default::default()
-                    },
-                    Transform {
-                        translation: Vec3 {
-                            x: block.0 * size,
-                            y: block.1 * size,
-                            z: 0.,
-                        },
-                        ..Default::default()
-                    },
-                    Ground,
-                    Collider {
-                        height: size,
-                        width: size,
-                    },
+                commands.spawn(bundle_ground(
+                    &asset_server,
+                    &mut texture_atlas_layouts,
+                    &block,
+                ));
+            }
+            Block::RedTurtle => {
+                commands.spawn(bundle_red_turtle(
+                    &asset_server,
+                    &mut texture_atlas_layouts,
+                    &block,
                 ));
             }
             Block::FakeGround => {
-                let texture: Handle<Image> = asset_server.load("stages/ground_sheet.png");
-                let size = 16.;
-                let layout = TextureAtlasLayout::from_grid(
-                    UVec2 {
-                        x: size as u32,
-                        y: size as u32,
-                    },
-                    3,
-                    3,
-                    None,
-                    None,
-                );
-                let texture_atlas_layout = texture_atlas_layouts.add(layout);
-
-                commands.spawn((
-                    Sprite {
-                        image: texture,
-                        texture_atlas: Some(TextureAtlas {
-                            layout: texture_atlas_layout.clone(),
-                            index: 4,
-                        }),
-                        ..Default::default()
-                    },
-                    Transform {
-                        translation: Vec3 {
-                            x: block.0 * size,
-                            y: block.1 * size,
-                            z: 0.,
-                        },
-                        ..Default::default()
-                    },
+                commands.spawn(bundle_fake_ground(
+                    &asset_server,
+                    &mut texture_atlas_layouts,
+                    &block,
                 ));
             }
             Block::None => {}

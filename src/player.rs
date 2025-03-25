@@ -62,13 +62,20 @@ pub fn player_sprite_controller(
                 width = 16;
                 height = 26;
             }
+            PlayerState::Death => {
+                sprite = "player/player_death.png";
+                first = 0;
+                last = 0;
+                width = 16;
+                height = 16;
+            }
         }
 
         player.2.first_frame = first;
         player.2.last_frame = last;
 
         let texture: Handle<Image> = asset_server.load(sprite);
-        let layout = TextureAtlasLayout::from_grid(
+        let layout: TextureAtlasLayout = TextureAtlasLayout::from_grid(
             UVec2 {
                 x: width,
                 y: height,
@@ -78,7 +85,7 @@ pub fn player_sprite_controller(
             Some(UVec2 { x: 1, y: 0 }),
             None,
         );
-        let texture_atlas_layout = texture_atlas_layouts.add(layout);
+        let texture_atlas_layout: Handle<TextureAtlasLayout> = texture_atlas_layouts.add(layout);
 
         player.0.image = texture.clone();
         player.0.texture_atlas = Some(TextureAtlas {
@@ -89,7 +96,7 @@ pub fn player_sprite_controller(
 }
 
 pub fn player_state_controller(
-    mut players: Query<(&mut Player, &mut Movable, &mut Sprite), With<Player>>,
+    mut players: Query<(&mut Player, &mut Movable, &mut Sprite, &mut Collider), With<Player>>,
 ) {
     for mut player in players.iter_mut() {
         match player.1.vel_x.signum() {
@@ -103,12 +110,22 @@ pub fn player_state_controller(
                 player.2.flip_x = player.2.flip_x;
             }
         }
-        if player.1.vel_y != 0. {
-            player.0.state = PlayerState::Jumping;
-        } else if player.1.vel_x != 0. {
-            player.0.state = PlayerState::Walking;
-        } else {
-            player.0.state = PlayerState::Idle;
+
+        match player.0.state {
+            PlayerState::Death => {
+                player.1.vel_x = 0.;
+                player.3.width = -1.;
+                player.3.height = -1.;
+            }
+            _ => {
+                if player.1.vel_y != 0. {
+                    player.0.state = PlayerState::Jumping;
+                } else if player.1.vel_x != 0. {
+                    player.0.state = PlayerState::Walking;
+                } else {
+                    player.0.state = PlayerState::Idle;
+                }
+            }
         }
     }
 }
@@ -120,8 +137,12 @@ pub fn player_movement(
     let new_movment = ((keyboard_input.pressed(KeyCode::KeyD) as i8)
         - (keyboard_input.pressed(KeyCode::KeyA) as i8)) as f32;
     for mut player in players.iter_mut() {
-        println!("Player.Y = {}", player.1.vel_y);
-        println!("Player.X = {}", player.1.vel_x);
+        match player.0.state {
+            PlayerState::Death => {
+                continue;
+            }
+            _ => {}
+        }
         if player.1.vel_x.abs() >= player.1.max_vel_x {
             player.1.vel_x = player.1.max_vel_x * player.1.vel_x.signum();
         }
@@ -142,10 +163,16 @@ pub fn player_jump(
     >,
     ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
-    let new_movment = (keyboard_input.pressed(KeyCode::Space) as i8) as f32;
+    let new_movment: f32 = (keyboard_input.pressed(KeyCode::Space) as i8) as f32;
     for mut player in players.iter_mut() {
-        let mut can_jump = false;
-        let mut entity_transform = player.3.clone();
+        match player.0.state {
+            PlayerState::Death => {
+                continue;
+            }
+            _ => {}
+        }
+        let mut can_jump: bool = false;
+        let mut entity_transform: Transform = player.3.clone();
         entity_transform.translation.y -= 5.;
 
         for ground in ground_querry.iter() {

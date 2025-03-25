@@ -1,16 +1,18 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Player {
     pub state: PlayerState,
     pub speed: f32,
     pub jump_force: f32,
 }
 
+#[derive(Debug)]
 pub enum PlayerState {
     Idle,
     Walking,
     Jumping,
+    Death,
 }
 
 #[derive(Component)]
@@ -50,6 +52,7 @@ pub enum Block {
     Player,
     Ground,
     FakeGround,
+    RedTurtle,
     None,
 }
 
@@ -63,4 +66,20 @@ pub struct Ground;
 pub struct Collider {
     pub width: f32,
     pub height: f32,
+}
+
+#[derive(Component)]
+pub struct Enemy {
+    pub state: EnemyState,
+    pub speed: f32,
+    pub enemy_type: EnemyType,
+}
+
+pub enum EnemyType {
+    RedTurtle,
+}
+
+pub enum EnemyState {
+    Walking,
+    Death,
 }
