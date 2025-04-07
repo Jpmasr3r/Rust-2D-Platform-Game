@@ -39,6 +39,13 @@ pub fn setup_stage_1(
                     &block,
                 ));
             }
+            Block::PowerBlock => {
+                commands.spawn(bundle_power_block(
+                    &asset_server,
+                    &mut texture_atlas_layouts,
+                    &block,
+                ));
+            }
             Block::None => {}
         }
     }

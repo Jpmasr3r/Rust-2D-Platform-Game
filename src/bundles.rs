@@ -155,3 +155,51 @@ pub fn bundle_fake_ground(
 
     bundle
 }
+
+pub fn bundle_power_block(
+    asset_server: &Res<AssetServer>,
+    texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
+    block: &(f32, f32, Block),
+) -> (Sprite, Transform, PowerBlock, Collider) {
+    let texture: Handle<Image> = asset_server.load("stages/mario-3-power-block.png");
+    let size: f32 = 16.;
+    let layout: TextureAtlasLayout = TextureAtlasLayout::from_grid(
+        UVec2 {
+            x: size as u32,
+            y: size as u32,
+        },
+        1,
+        1,
+        None,
+        None,
+    );
+    let texture_atlas_layout: Handle<TextureAtlasLayout> = texture_atlas_layouts.add(layout);
+
+    let bundle: (Sprite, Transform, PowerBlock, Collider) = (
+        Sprite {
+            image: texture,
+            texture_atlas: Some(TextureAtlas {
+                layout: texture_atlas_layout.clone(),
+                index: 1,
+            }),
+            ..Default::default()
+        },
+        Transform {
+            translation: Vec3 {
+                x: block.0 * size,
+                y: block.1 * size,
+                z: 0.,
+            },
+            ..Default::default()
+        },
+        PowerBlock {
+            power_up: PowerUps::Mushroom,
+        },
+        Collider {
+            height: 16.,
+            width: 16.,
+        },
+    );
+
+    bundle
+}

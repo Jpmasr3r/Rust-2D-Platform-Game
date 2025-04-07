@@ -52,6 +52,7 @@ pub enum Block {
     Ground,
     FakeGround,
     RedTurtle,
+    PowerBlock,
     None,
 }
 
@@ -81,4 +82,15 @@ pub enum EnemiesType {
 pub enum EnemiesState {
     Walking,
     Death,
+}
+
+#[derive(Component)]
+pub struct PowerBlock {
+    pub power_up: PowerUps,
+}
+
+pub enum PowerUps {
+    Mushroom,
+    FireFlower,
+    TanukiSuit,
 }

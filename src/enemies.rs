@@ -128,10 +128,6 @@ pub fn kill_player(
 ) {
     for mut player in players_querry.iter_mut() {
         for enemie in enemies_querry.iter_mut() {
-            println!(
-                "PlayerX {} , PlayerY {}",
-                player.2.translation.x, player.2.translation.y
-            );
             match enemie.0.state {
                 EnemiesState::Death => {
                     if enemie.3.vel_x == 0. {

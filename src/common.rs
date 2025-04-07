@@ -106,6 +106,7 @@ pub fn load_image_to_blocks(image_path: &str) -> Vec<(f32, f32, Block)> {
             (255, 255, 0) => Block::Ground,
             (0, 0, 0) => Block::FakeGround,
             (255, 0, 0) => Block::RedTurtle,
+            (0, 255, 0) => Block::PowerBlock,
             _ => Block::None,
         };
         if rgba[3] != 255 {
