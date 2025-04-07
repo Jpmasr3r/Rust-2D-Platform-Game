@@ -6,8 +6,15 @@ pub fn bundle_red_turtle(
     asset_server: &Res<AssetServer>,
     texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
     block: &(f32, f32, Block),
-) -> (Sprite, Transform, AnimationConfig, Collider, Movable, Enemy) {
-    let texture: Handle<Image> = asset_server.load("enemys/red turtle/red_turtle_walk.png");
+) -> (
+    Sprite,
+    Transform,
+    AnimationConfig,
+    Collider,
+    Movable,
+    Enemies,
+) {
+    let texture: Handle<Image> = asset_server.load("enemies/red turtle/red_turtle_walk.png");
     let layout: TextureAtlasLayout = TextureAtlasLayout::from_grid(
         UVec2 { x: 16, y: 27 },
         2,
@@ -17,7 +24,14 @@ pub fn bundle_red_turtle(
     );
     let texture_atlas_layout: Handle<TextureAtlasLayout> = texture_atlas_layouts.add(layout);
 
-    let bundle: (Sprite, Transform, AnimationConfig, Collider, Movable, Enemy) = (
+    let bundle: (
+        Sprite,
+        Transform,
+        AnimationConfig,
+        Collider,
+        Movable,
+        Enemies,
+    ) = (
         Sprite {
             image: texture,
             texture_atlas: Some(TextureAtlas {
@@ -41,14 +55,14 @@ pub fn bundle_red_turtle(
         },
         Movable {
             max_vel_x: 50.,
-            max_vel_y: (2.0 * GRAVITY * 32.).sqrt(),
+            max_vel_y: (2. * GRAVITY * 32.).sqrt(),
             vel_x: 0.,
             vel_y: 0.,
         },
-        Enemy {
-            state: EnemyState::Walking,
+        Enemies {
+            state: EnemiesState::Walking,
             speed: 50.,
-            enemy_type: EnemyType::RedTurtle,
+            enemies_type: EnemiesType::RedTurtle,
         },
     );
 

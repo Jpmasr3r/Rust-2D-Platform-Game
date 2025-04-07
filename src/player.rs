@@ -13,7 +13,6 @@ pub fn player_setup(commands: &mut Commands, x: f32, y: f32) {
         },
         Player {
             state: PlayerState::Idle,
-            speed: 50.,
             jump_force: (2.0 * GRAVITY * 64.).sqrt(),
         },
         AnimationConfig::new(10, 0, 0),
@@ -143,12 +142,9 @@ pub fn player_movement(
             }
             _ => {}
         }
-        if player.1.vel_x.abs() >= player.1.max_vel_x {
-            player.1.vel_x = player.1.max_vel_x * player.1.vel_x.signum();
-        }
 
         if new_movment != 0. {
-            player.1.vel_x += new_movment * player.0.speed;
+            player.1.vel_x += new_movment * 65504.;
         } else {
             player.1.vel_x = 0.;
         }

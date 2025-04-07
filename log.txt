@@ -1,0 +1,10 @@
+Jpmasr3r (8):
+      initialize 2D platformer game with Bevy framework and basic player mechanics
+      Implement gravity and acceleration systems; refactor player setup and stage initialization
+      Update README to include image-based map generation feature
+      Add camera controller system and CameraPlayer component; update stage setup
+      Refactor acceleration and gravity systems; add collision detection and ground components
+      Update README and refactor player movement and physics; rename Gravity to Movable and improve player controls
+      Refactor player movement and jump mechanics; add player state handling and improve gravity calculations
+      Add enemy functionality and integrate red turtle behavior; implement movement, state handling, and sprite management
+

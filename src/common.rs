@@ -33,6 +33,12 @@ pub fn acceleration(
     time: Res<Time>,
 ) {
     for mut entity in entity_query.iter_mut() {
+        if entity.1.vel_x.abs() >= entity.1.max_vel_x.abs() {
+            entity.1.vel_x = entity.1.max_vel_x * entity.1.vel_x.signum();
+        }
+        if entity.1.vel_y.abs() >= entity.1.max_vel_y.abs() {
+            entity.1.vel_y = entity.1.max_vel_y * entity.1.vel_y.signum();
+        }
         entity.0.translation.y += entity.1.vel_y * time.delta_secs();
         entity.0.translation.x += entity.1.vel_x * time.delta_secs();
     }
@@ -59,9 +65,6 @@ pub fn gravity(
             }
         }
 
-        if entity.0.vel_y.abs() >= entity.0.max_vel_y {
-            entity.0.vel_y = entity.0.max_vel_y * entity.0.vel_y.signum();
-        }
         if in_grav {
             entity.0.vel_y -= acelartion;
         } else if entity.0.vel_y < 0. {

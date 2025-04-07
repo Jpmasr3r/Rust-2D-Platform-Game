@@ -3,7 +3,6 @@ use bevy::prelude::*;
 #[derive(Component, Debug)]
 pub struct Player {
     pub state: PlayerState,
-    pub speed: f32,
     pub jump_force: f32,
 }
 
@@ -69,17 +68,17 @@ pub struct Collider {
 }
 
 #[derive(Component)]
-pub struct Enemy {
-    pub state: EnemyState,
+pub struct Enemies {
+    pub state: EnemiesState,
     pub speed: f32,
-    pub enemy_type: EnemyType,
+    pub enemies_type: EnemiesType,
 }
 
-pub enum EnemyType {
+pub enum EnemiesType {
     RedTurtle,
 }
 
-pub enum EnemyState {
+pub enum EnemiesState {
     Walking,
     Death,
 }

@@ -1,17 +1,18 @@
 use bevy::prelude::*;
 use common::*;
-use enemys::*;
+use enemies::*;
 use player::*;
 use stage_1::*;
 
 mod bundles;
 mod common;
-mod enemys;
+mod enemies;
 mod modules;
 mod player;
 mod stage_1;
 
-const GRAVITY: f32 = 9.8 * 50.;
+const GRAVITY_MOD: f32 = 50.;
+const GRAVITY: f32 = 9.8 * GRAVITY_MOD;
 
 fn main() {
     let mut app = App::new();
@@ -40,9 +41,9 @@ fn update(app: &mut App) {
     app.add_systems(Update, player_sprite_controller);
     app.add_systems(Update, player_state_controller);
 
-    //Enemy Updates
-    app.add_systems(Update, enemy_movement);
-    app.add_systems(Update, enemy_state_controller);
-    app.add_systems(Update, enemy_sprite_controller);
+    //Enemies Updates
+    app.add_systems(Update, enemies_movement);
+    app.add_systems(Update, enemies_state_controller);
+    app.add_systems(Update, enemies_sprite_controller);
     app.add_systems(Update, kill_player);
 }
