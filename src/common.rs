@@ -29,8 +29,9 @@ pub fn camera_controller(
 }
 
 pub fn acceleration(
-    mut entity_query: Query<(&mut Transform, &mut Movable), With<Movable>>,
+    mut entity_query: Query<(&mut Transform, &mut Movable,&Collider), With<Movable>>,
     time: Res<Time>,
+    ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
     for mut entity in entity_query.iter_mut() {
         if entity.1.vel_x.abs() >= entity.1.max_vel_x.abs() {
@@ -39,6 +40,14 @@ pub fn acceleration(
         if entity.1.vel_y.abs() >= entity.1.max_vel_y.abs() {
             entity.1.vel_y = entity.1.max_vel_y * entity.1.vel_y.signum();
         }
+
+        for ground in ground_querry.iter() {
+            if check_colision(, ground) {
+                in_grav = false;
+                break;
+            }
+        }
+
         entity.0.translation.y += entity.1.vel_y * time.delta_secs();
         entity.0.translation.x += entity.1.vel_x * time.delta_secs();
     }
@@ -49,27 +58,30 @@ pub fn gravity(
         (&mut Movable, &Collider, &mut Transform),
         (With<Movable>, Without<Ground>),
     >,
-    ground_querry: Query<(&Collider, &Transform), With<Ground>>,
+    // ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
     for mut entity in entity_querry.iter_mut() {
-        let mut in_grav: bool = true;
         let acelartion: f32 = 5.;
+        entity.0.vel_y -= acelartion;
 
-        let mut transform_a: Transform = entity.2.clone();
-        transform_a.translation.y -= acelartion;
+        // let mut in_grav: bool = true;
+        // let acelartion: f32 = 5.;
 
-        for ground in ground_querry.iter() {
-            if check_colision((entity.1, &transform_a), ground) {
-                in_grav = false;
-                break;
-            }
-        }
+        // let mut transform_a: Transform = entity.2.clone();
+        // transform_a.translation.y -= acelartion;
 
-        if in_grav {
-            entity.0.vel_y -= acelartion;
-        } else if entity.0.vel_y < 0. {
-            entity.0.vel_y = 0.;
-        }
+        // for ground in ground_querry.iter() {
+        //     if check_colision((entity.1, &transform_a), ground) {
+        //         in_grav = false;
+        //         break;
+        //     }
+        // }
+
+        // if in_grav {
+        //     entity.0.vel_y -= acelartion;
+        // } else if entity.0.vel_y < 0. {
+        //     entity.0.vel_y = 0.;
+        // }
     }
 }
 
