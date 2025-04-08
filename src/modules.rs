@@ -45,6 +45,7 @@ pub struct Movable {
     pub vel_x: f32,
     pub max_vel_y: f32,
     pub max_vel_x: f32,
+    pub in_grav: bool,
 }
 
 pub enum Block {

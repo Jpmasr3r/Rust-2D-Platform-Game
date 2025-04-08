@@ -21,6 +21,7 @@ pub fn player_setup(commands: &mut Commands, x: f32, y: f32) {
             max_vel_y: (2.0 * GRAVITY * 32.).sqrt(),
             vel_x: 0.,
             vel_y: 0.,
+            in_grav: true,
         },
         Collider {
             width: 16.,
@@ -157,7 +158,6 @@ pub fn player_jump(
         (&mut Player, &mut Movable, &Collider, &Transform),
         (With<Player>, Without<Ground>),
     >,
-    ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
     let new_movment: f32 = (keyboard_input.pressed(KeyCode::Space) as i8) as f32;
     for mut player in players.iter_mut() {
@@ -167,16 +167,8 @@ pub fn player_jump(
             }
             _ => {}
         }
-        let mut can_jump: bool = false;
-        let mut entity_transform: Transform = player.3.clone();
-        entity_transform.translation.y -= 5.;
 
-        for ground in ground_querry.iter() {
-            if check_colision((player.2, &entity_transform), ground) {
-                can_jump = true;
-            }
-        }
-        if new_movment != 0. && can_jump {
+        if !player.1.in_grav {
             player.1.vel_y += new_movment * player.0.jump_force;
         }
     }

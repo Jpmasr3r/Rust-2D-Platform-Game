@@ -29,7 +29,10 @@ pub fn camera_controller(
 }
 
 pub fn acceleration(
-    mut entity_query: Query<(&mut Transform, &mut Movable,&Collider), With<Movable>>,
+    mut entity_query: Query<
+        (&mut Transform, &mut Movable, &Collider),
+        (With<Movable>, Without<Ground>),
+    >,
     time: Res<Time>,
     ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
@@ -41,15 +44,35 @@ pub fn acceleration(
             entity.1.vel_y = entity.1.max_vel_y * entity.1.vel_y.signum();
         }
 
+        let mut new_movement_y: Transform = entity.0.clone();
+        new_movement_y.translation.y += 5. * entity.1.vel_y.signum();
+        let mut new_movement_x: Transform = entity.0.clone();
+        new_movement_x.translation.x += 5. * entity.1.vel_y.signum();
+
+        entity.1.in_grav = true;
+        let (mut mov_x, mut mov_y): (bool, bool) = (true, true);
         for ground in ground_querry.iter() {
-            if check_colision(, ground) {
-                in_grav = false;
-                break;
+            if check_colision((entity.2, &new_movement_y), ground) {
+                mov_y = false;
+            }
+            if check_colision((entity.2, &new_movement_x), ground) {
+                mov_x = false;
             }
         }
 
-        entity.0.translation.y += entity.1.vel_y * time.delta_secs();
-        entity.0.translation.x += entity.1.vel_x * time.delta_secs();
+        entity.1.in_grav = mov_y;
+
+        if mov_y {
+            entity.0.translation.y += entity.1.vel_y * time.delta_secs();
+        }
+        if mov_x {
+            entity.0.translation.x += entity.1.vel_x * time.delta_secs();
+        }
+
+        println!(
+            "Entity position: x = {}, y = {} --- Entity velocity: vel_x = {}, vel_y = {}",
+            entity.0.translation.x, entity.0.translation.y, entity.1.vel_x, entity.1.vel_y
+        );
     }
 }
 
@@ -58,30 +81,10 @@ pub fn gravity(
         (&mut Movable, &Collider, &mut Transform),
         (With<Movable>, Without<Ground>),
     >,
-    // ground_querry: Query<(&Collider, &Transform), With<Ground>>,
 ) {
     for mut entity in entity_querry.iter_mut() {
-        let acelartion: f32 = 5.;
-        entity.0.vel_y -= acelartion;
-
-        // let mut in_grav: bool = true;
-        // let acelartion: f32 = 5.;
-
-        // let mut transform_a: Transform = entity.2.clone();
-        // transform_a.translation.y -= acelartion;
-
-        // for ground in ground_querry.iter() {
-        //     if check_colision((entity.1, &transform_a), ground) {
-        //         in_grav = false;
-        //         break;
-        //     }
-        // }
-
-        // if in_grav {
-        //     entity.0.vel_y -= acelartion;
-        // } else if entity.0.vel_y < 0. {
-        //     entity.0.vel_y = 0.;
-        // }
+        let acelartion: f32 = -5.;
+        entity.0.vel_y += acelartion;
     }
 }
 

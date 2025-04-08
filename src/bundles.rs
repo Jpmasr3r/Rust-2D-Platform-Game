@@ -58,6 +58,7 @@ pub fn bundle_red_turtle(
             max_vel_y: (2. * GRAVITY * 32.).sqrt(),
             vel_x: 0.,
             vel_y: 0.,
+            in_grav: true,
         },
         Enemies {
             state: EnemiesState::Walking,
